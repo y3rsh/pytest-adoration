@@ -2,7 +2,6 @@ name: testing
 
 on: [push]
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,7 +10,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@main
       with:
-        version: 3.8.4
+        python-version: 3.8.4
     - name: install dependencies
       run: pip install -r requirements.txt
     - name: black

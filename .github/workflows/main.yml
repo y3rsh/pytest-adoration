@@ -1,24 +1,22 @@
-name:
+name: testing
 
-    on:
-      push:
-        branches:
-          - main
-    
-    jobs:
-      run:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@master
-          - name: Setup Python
-            uses: actions/setup-python@master
-            with:
-              version: 3.8.4
-          - name: install dependencies
-            run: pip install -r requirements.txt
-          - name: black
-            run: black . --check
-          - name: flake8
-            run: flake8
-          - name: Run all tests
-            run: pytest
+on: [push]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - name: Setup Python
+      uses: actions/setup-python@main
+      with:
+        version: 3.8.4
+    - name: install dependencies
+      run: pip install -r requirements.txt
+    - name: black
+      run: black . --check
+    - name: flake8
+      run: flake8
+    - name: Run all tests
+      run: pytest

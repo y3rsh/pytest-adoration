@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 def pytest_addoption(parser):
     parser.addoption("--base-url", action="store", default="api.zippopotam.us")
+    parser.addoption(
+        "--remote-dynamo", action="store_true", default=False,
+    )
 
 
 @pytest.fixture
@@ -31,6 +34,12 @@ def test_run_id(request, record_property):
 
 # after we know what tests are collected to run
 def pytest_report_collectionfinish(config, startdir, items):
+    if config.getoption("--remote-dynamo"):
+        logger.info("Using remote dynamo")
+        pytest.db = db.DynamoSessions(False)
+    else:
+        logger.info("Using local dynamo")
+        pytest.db = db.DynamoSessions()
     sessionid = str(uuid.uuid4().hex)  # generate a unique id for the test session
     logger.info(f"sessionid is {sessionid}")
     pytest.session = Session(
@@ -41,7 +50,7 @@ def pytest_report_collectionfinish(config, startdir, items):
         [item.nodeid for item in items],
     )
     logger.info(pytest.session.collected_tests)
-    db.put_session(pytest.session)
+    pytest.db.put_session(pytest.session)
 
 
 # after each test stage
@@ -49,7 +58,7 @@ def pytest_runtest_logreport(report):
     pytest.session.add_stage(
         report.nodeid, report.when, report.outcome, util.timestamp()
     )
-    db.put_session(pytest.session)
+    pytest.db.put_session(pytest.session)
 
 
 # after all tests finished
@@ -58,4 +67,4 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     # todo add test result data to the object
     print(vars(terminalreporter))
     logger.info(pytest.session.stages)
-    db.put_session(pytest.session)
+    pytest.db.put_session(pytest.session)

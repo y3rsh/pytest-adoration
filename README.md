@@ -37,6 +37,8 @@
 
 ## Important environment variables
 
+Most CI systems make it easy to set environment variables so we will use them to inform our reporting what is under test.
+
 ### ENVIRONMENT
 
 > What environment is the test running against - set to `empty` if not defined
@@ -44,6 +46,10 @@
 ### APP_VERSION
 
 > What version of the app the test is running against - set to `empty` if not defined
+
+### DYNAMO_LOCAL_URL
+
+> "http://localhost:8000" is hard coded but can be overridden
 
 ## Local execution (relative commands in project root dir)
 
@@ -53,6 +59,7 @@
     - `poetry install`
 3. create the table locally
     - `poetry run python db.py`
-4. run the tests
-    - `poetry run pytest`
-
+4. run the tests using local dynamo
+    - `poetry run pytest --log-cli-level debug`
+5. run the tests using remote dynamo (AWS CLI config read by boto)
+    - `poetry run pytest --remote-dynamo --log-cli-level debug`

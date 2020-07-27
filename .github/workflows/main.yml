@@ -17,5 +17,14 @@ jobs:
       run: black . --check
     - name: flake8
       run: flake8
-    - name: Run all tests
-      run: pytest --log-cli-level debug
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: Run All Tests
+      run: pytest --remote-dynamo --log-cli-level debug
+      env:
+        ENVIRONMENT: github
+        APP_VERSION: 0.1.0

@@ -2,7 +2,7 @@ import pytest
 import logging
 from zip import Zip
 
-valid_zip_codes = ["66046", "66502", "94608", "02861", "65202", "99705", "kifg"]
+valid_zip_codes = ["66046", "66502", "94608", "02861", "65202", "99705"]
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,6 @@ id_named_valid_zip_codes = [
     pytest.param("hgjfhg", marks=[pytest.mark.xfail], id="xfailed_example"),
     pytest.param("66502", marks=[pytest.mark.xfail], id="xpassed_example"),
     pytest.param("66502", marks=[pytest.mark.skip], id="skip_example"),
-
 ]
 
 

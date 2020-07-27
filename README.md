@@ -6,6 +6,7 @@
 
 - Locally install python 3.8.4 and poetry and have on your path.
 - run the commands in the project directory
+- docker if you want the local DB
 
 ### Notes
 
@@ -32,3 +33,26 @@
 - hypothesis example
 - always failing test?
 - mocking, monkeypatch unit examples?
+- add action to generate the requirements.txt on push
+
+## Important environment variables
+
+### ENVIRONMENT
+
+> What environment is the test running against - set to `empty` if not defined
+
+### APP_VERSION
+
+> What version of the app the test is running against - set to `empty` if not defined
+
+## Local execution (relative commands in project root dir)
+
+1. start the local dynamo
+    - `docker-compose up`
+2. make sure everything is installed
+    - `poetry install`
+3. create the table locally
+    - `poetry run python db.py`
+4. run the tests
+    - `poetry run pytest`
+

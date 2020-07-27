@@ -129,6 +129,4 @@ if __name__ == "__main__":
         print(f"table {table}")
     else:
         test_run_table = db.create_sessions_table()
-        logger.info(
-            f"Table status after create: {test_run_table.table_status}"
-        )
+        logger.info(f"Table status after create: {test_run_table.table_status}")

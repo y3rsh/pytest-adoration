@@ -109,7 +109,7 @@ if __name__ == "__main__":
     logging.basicConfig(
         format="%(asctime)s %(message)s",
         datefmt="%m/%d/%Y %I:%M:%S %p",
-        level=logging.DEBUG,
+        level=logging.INFO,
     )
     db = DynamoSessions()
     if len(sys.argv) == 2:
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             exit(0)
     table = None
     try:
-        table = db.describe_table(TableName=TABLE_NAME)
+        table = db.get_dynamodb_client().describe_table(TableName=TABLE_NAME)
     except ClientError as ce:
         if ce.response["Error"]["Code"] == "ResourceNotFoundException":
             logger.info(f"table does not exist: {ce}")
@@ -129,4 +129,6 @@ if __name__ == "__main__":
         print(f"table {table}")
     else:
         test_run_table = db.create_sessions_table()
-        logger.info("Table status:", test_run_table.table_status)
+        logger.info(
+            f"Table status after create: {test_run_table.table_status}"
+        )

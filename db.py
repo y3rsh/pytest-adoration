@@ -7,10 +7,12 @@ from botocore.exceptions import ClientError
 from botocore.exceptions import EndpointConnectionError
 from botocore.client import Config
 from session import Session
+from stage import Stage
 
 logger = logging.getLogger(__name__)
 
-TABLE_NAME = "Sessions"
+SESSIONS_TABLE_NAME = "Sessions"
+STAGES_TABLE_NAME = "Stages"
 DYNAMO_LOCAL_URL = os.environ.get("DYNAMO_LOCAL_URL", "http://localhost:8000")
 
 
@@ -27,7 +29,7 @@ def no_connection(func):
 class DynamoSessions:
     def __init__(self, local=True):
         self.local = local
-        self.config = Config(connect_timeout=3, retries={"max_attempts": 0})
+        self.config = Config(connect_timeout=3, retries={"max_attempts": 1})
         self.db_connection = True
         self.dynamo_resource = self.get_dynamodb_resource()
         self.dynamo_client = self.get_dynamodb_client()
@@ -58,7 +60,7 @@ class DynamoSessions:
     def create_sessions_table(self):
         try:
             table = self.dynamo_resource.create_table(
-                TableName=TABLE_NAME,
+                TableName=SESSIONS_TABLE_NAME,
                 KeySchema=[
                     {"AttributeName": "sessionid", "KeyType": "HASH"},
                 ],  # noqaE231
@@ -76,29 +78,56 @@ class DynamoSessions:
             self.db_connection = False
 
     @no_connection
-    def put_session(self, session: Session):
+    def create_stages_table(self):
         try:
-            table = self.dynamo_resource.Table(TABLE_NAME)
-            item = vars(session)
-            print(item)
-            return table.put_item(Item=item)
+            table = self.dynamo_resource.create_table(
+                TableName=STAGES_TABLE_NAME,
+                KeySchema=[
+                    {"AttributeName": "stageid", "KeyType": "HASH"},
+                ],  # noqaE231
+                AttributeDefinitions=[
+                    {"AttributeName": "stageid", "AttributeType": "S"},
+                ],  # noqaE231
+                ProvisionedThroughput={
+                    "ReadCapacityUnits": 10,
+                    "WriteCapacityUnits": 10,
+                },
+            )
+            return table
         except EndpointConnectionError as e:
             logger.warning(f"Not connected to dynamo {e}")
             self.db_connection = False
 
     @no_connection
-    def delete_test_run_table(self):
+    def put_object(self, table_name, object):
         try:
-            table = self.dynamo_resource.Table(TABLE_NAME)
+            table = self.dynamo_resource.Table(table_name)
+            item = vars(object)
+            logger.debug(f"Item to be put in {table_name} = {item}")
+            return table.put_item(Item=item)
+        except EndpointConnectionError as e:
+            logger.warning(f"Not connected to dynamo {e}")
+            self.db_connection = False
+
+    def put_session(self, session: Session):
+        self.put_object(SESSIONS_TABLE_NAME, session)
+
+    def put_stage(self, stage: Stage):
+        self.put_object(STAGES_TABLE_NAME, stage)
+
+    @no_connection
+    def delete_table(self, table_name):
+        try:
+            table = self.dynamo_resource.Table(table_name)
             logger.info(table.delete())
         except EndpointConnectionError as e:
             logger.warning(f"Not connected to dynamo {e}")
             self.db_connection = False
 
     @no_connection
-    def query_sessions(self):
+    def scan_table(self, table_name):
         try:
-            table = self.dynamo_resource.Table(TABLE_NAME)
+            table = self.dynamo_resource.Table(table_name)
             return table.scan()
         except EndpointConnectionError as e:
             logger.warning(f"Not connected to dynamo {e}")
@@ -114,19 +143,29 @@ if __name__ == "__main__":
     db = DynamoSessions()
     if len(sys.argv) == 2:
         if sys.argv[1] == "delete":
-            db.delete_test_run_table()
+            db.delete_table(SESSIONS_TABLE_NAME)
+            db.delete_table(STAGES_TABLE_NAME)
             exit(0)
         elif sys.argv[1] == "scan":
-            logger.info(pprint(db.query_sessions()))
+            logger.info(pprint(db.scan_table(SESSIONS_TABLE_NAME)))
+            logger.info(pprint(db.scan_table(STAGES_TABLE_NAME)))
             exit(0)
-    table = None
+    sessions = None
     try:
-        table = db.get_dynamodb_client().describe_table(TableName=TABLE_NAME)
+        sessions = db.get_dynamodb_client().describe_table(
+            TableName=SESSIONS_TABLE_NAME
+        )
+        stages = db.get_dynamodb_client().describe_table(TableName=STAGES_TABLE_NAME)
     except ClientError as ce:
         if ce.response["Error"]["Code"] == "ResourceNotFoundException":
             logger.info(f"table does not exist: {ce}")
-    if table:
-        print(f"table {table}")
+    if sessions and stages:
+        logger.info(f"table {sessions}")
+        logger.info(f"table {stages}")
     else:
-        test_run_table = db.create_sessions_table()
-        logger.info(f"Table status after create: {test_run_table.table_status}")
+        sessions_table = db.create_sessions_table()
+        logger.info(
+            f"Sessions table status after create: {sessions_table.table_status}"
+        )
+        stages_table = db.create_stages_table()
+        logger.info(f"Stages table status after create: {stages_table.table_status}")

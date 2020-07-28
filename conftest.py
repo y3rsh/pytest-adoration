@@ -5,6 +5,7 @@ import pytest
 import db
 from zippopotam_client import ZippopotamClient
 from session import Session
+from stage import Stage
 import util
 
 logger = logging.getLogger(__name__)
@@ -22,14 +23,11 @@ def zippopotam_client(request) -> ZippopotamClient:
     return ZippopotamClient(request.config.getoption("--base-url"))
 
 
-@pytest.fixture(autouse=True)
-def test_run_id(request, record_property):
+def pytest_runtest_logstart(nodeid, location):
     """
         Runs before each test.
-        testexecutionid will be the same for each test run in this collection
     """
-    pass
-    # record_property("testexecutionid", str(uuid.uuid4().hex))
+    pytest.testid = str(uuid.uuid4().hex)
 
 
 # after we know what tests are collected to run
@@ -55,16 +53,24 @@ def pytest_report_collectionfinish(config, startdir, items):
 
 # after each test stage
 def pytest_runtest_logreport(report):
-    pytest.session.add_stage(
-        report.nodeid, report.when, report.outcome, util.timestamp()
+    stageid = pytest.testid + "-" + report.when  # unique id
+    logger.info(f"stageid = {stageid}")
+    stage = Stage(
+        stageid,
+        report.nodeid,
+        pytest.session.sessionid,
+        pytest.session.environment,
+        pytest.session.app_version,
+        report.when,
+        report.outcome,
+        util.timestamp(),
     )
-    pytest.db.put_session(pytest.session)
+    logger.debug("stage is: {stage}")
+    pytest.db.put_stage(stage)
 
 
 # after all tests finished
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     pytest.session.finish_time = util.timestamp()
-    # todo add test result data to the object
-    print(vars(terminalreporter))
-    logger.info(pytest.session.stages)
+    # todo add test result data to the session
     pytest.db.put_session(pytest.session)

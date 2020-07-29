@@ -26,7 +26,7 @@ def no_connection(func):
     return wrapper
 
 
-class DynamoSessions:
+class Dynamo:
     def __init__(self, local=True):
         self.local = local
         self.config = Config(connect_timeout=3, retries={"max_attempts": 1})
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         datefmt="%m/%d/%Y %I:%M:%S %p",
         level=logging.INFO,
     )
-    db = DynamoSessions()
+    db = Dynamo()
     if len(sys.argv) == 2:
         if sys.argv[1] == "delete":
             db.delete_table(SESSIONS_TABLE_NAME)

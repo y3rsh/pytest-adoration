@@ -2,7 +2,7 @@ import uuid
 import os
 import logging
 import pytest
-import db
+import dynamo as db
 from zippopotam_client import ZippopotamClient
 from session import Session
 from stage import Stage
@@ -34,10 +34,10 @@ def pytest_runtest_logstart(nodeid, location):
 def pytest_report_collectionfinish(config, startdir, items):
     if config.getoption("--remote-dynamo"):
         logger.info("Using remote dynamo")
-        pytest.db = db.DynamoSessions(False)
+        pytest.db = db.Dynamo(False)
     else:
         logger.info("Using local dynamo")
-        pytest.db = db.DynamoSessions()
+        pytest.db = db.Dynamo()
     sessionid = str(uuid.uuid4().hex)  # generate a unique id for the test session
     logger.info(f"sessionid is {sessionid}")
     pytest.session = Session(

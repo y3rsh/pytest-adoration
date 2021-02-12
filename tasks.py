@@ -7,7 +7,7 @@ from invoke import task
 @task
 def black(c):
     """
-        Run black - invoke black
+    Run black - invoke black
     """
     if os.name == "nt":
         p = subprocess.Popen(
@@ -25,7 +25,7 @@ def black(c):
 @task
 def flake8(c):
     """
-        run flake8 - invoke flake8
+    run flake8 - invoke flake8
     """
     c.run("""poetry run flake8""")
 
@@ -33,7 +33,7 @@ def flake8(c):
 @task
 def make_requirements(c):
     """
-        Update requirements.txt - invoke make-requirements
+    Update requirements.txt - invoke make-requirements
     """
     c.run("""poetry export -f requirements.txt > requirements.txt""")
 

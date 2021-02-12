@@ -14,7 +14,9 @@ logger = logging.getLogger(__name__)
 def pytest_addoption(parser):
     parser.addoption("--base-url", action="store", default="api.zippopotam.us")
     parser.addoption(
-        "--remote-dynamo", action="store_true", default=False,
+        "--remote-dynamo",
+        action="store_true",
+        default=False,
     )
 
 
@@ -25,7 +27,7 @@ def zippopotam_client(request) -> ZippopotamClient:
 
 def pytest_runtest_logstart(nodeid, location):
     """
-        Runs before each test.
+    Runs before each test.
     """
     pytest.testid = str(uuid.uuid4().hex)
 

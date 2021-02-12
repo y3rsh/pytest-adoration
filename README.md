@@ -4,13 +4,12 @@
 
 ## Prerequisites
 
-- Locally install python 3.8.4 and poetry and have on your path.
+- Locally install python 3.8.X and poetry and have on your path.
 - run the commands in the project directory
 - docker if you want the local DB
 
 ### Notes
 
-- using pytest 6, `poetry add pytest --allow-prerelease`
 - poetry gives us the functionality of update and manages our virtual environment
 - poetry gives us a deterministic requirements.txt with hashes
 - in out containers we want to use only pip as it is fast at downloading and installing dependencies

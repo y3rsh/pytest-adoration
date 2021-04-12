@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("zip", valid_zip_codes)
+@pytest.mark.parametrize("zip_code", valid_zip_codes)
 def test_valid_zip_codes(zippopotam_client, zip_code):
     """
     provided valid zip code data, validate response code and data load.
@@ -31,7 +31,7 @@ id_named_valid_zip_codes = [
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("zip", id_named_valid_zip_codes)
+@pytest.mark.parametrize("zip_code", id_named_valid_zip_codes)
 def test_valid_zip_codes_better_name(zippopotam_client, zip_code):
     """
     same as valid test but show how to name each test iteration

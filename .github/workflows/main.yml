@@ -10,13 +10,15 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@main
       with:
-        python-version: 3.8.4
+        python-version: 3.9.1
     - name: install dependencies
       run: pip install -r requirements.txt
     - name: black
       run: black . --check
     - name: flake8
       run: flake8
+    - name: pylint
+      run: pylint tests src
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -27,4 +29,4 @@ jobs:
       run: pytest --remote-dynamo --log-cli-level debug
       env:
         ENVIRONMENT: github
-        APP_VERSION: 0.1.0
+        APP_VERSION: 0.1.1

@@ -544,8 +544,8 @@ python-versions = "*"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.8"
-content-hash = "33d9065f11ae4c70221c86fbfcbc67e197860f094777fd6a9d0739d68048b1a6"
+python-versions = "^3.9"
+content-hash = "a3bb946ff04b57f83daa2fd75a5e74386146c9082bf14900c700afaf2f07ee0d"
 
 [metadata.files]
 apipkg = [

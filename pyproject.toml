@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "pytest-adoration"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Josh McVey <yersh13@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-pytest = "^6.0.0"
+python = "^3.9"
+pytest = "^6.2.3"
 flake8 = "^3.8.3"
 pytest-xdist = "^1.33.0"
 pytest-html = "^2.1.1"
@@ -20,8 +20,6 @@ pact-python = "^1.3.0"
 pylint = "^2.7.4"
 
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.3"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"

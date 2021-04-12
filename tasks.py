@@ -5,7 +5,7 @@ from invoke import task
 
 
 @task
-def black(c):
+def black(context):
     """
     Run black - invoke black
     """
@@ -19,27 +19,41 @@ def black(c):
         )
         p.communicate()
     else:
-        c.run("""find . | grep -E "(\.py$)" | xargs poetry run black""")  # noqa: W605
+        context.run(
+            """find . | grep -E "(\.py$)" | xargs poetry run black"""  # noqa: W605 pylint: disable=anomalous-backslash-in-string
+        )
 
 
 @task
-def flake8(c):
+def flake8(context):
     """
     run flake8 - invoke flake8
     """
-    c.run("""poetry run flake8""")
+    context.run("""poetry run flake8""")
 
 
 @task
-def make_requirements(c):
+def pylint(context):
+    """
+    run pylint - invoke pylint
+    """
+    context.run("""poetry run pylint tests src""")
+
+
+@task
+def make_requirements(context):
     """
     Update requirements.txt - invoke make-requirements
     """
-    c.run("""poetry export -f requirements.txt > requirements.txt""")
+    context.run("""poetry export -f requirements.txt > requirements.txt""")
 
 
 @task
-def ready(c):
-    black(c)
-    flake8(c)
-    make_requirements(c)
+def ready(context):
+    """
+    ready code for commit
+    """
+    black(context)
+    flake8(context)
+    pylint(context)
+    make_requirements(context)

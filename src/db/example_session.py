@@ -1,3 +1,4 @@
+# pylint: disable=pointless-statement
 {
     "sessionid": "22e8a2910cef4845b1aeabc68eaafdbc",
     "environment": "empty",

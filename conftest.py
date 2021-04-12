@@ -2,11 +2,11 @@ import uuid
 import os
 import logging
 import pytest
-import dynamo as db
-from zippopotam_client import ZippopotamClient
-from session import Session
-from stage import Stage
-import util
+import src.db.dynamo as db
+from src.zippopotam.zippopotam_client import ZippopotamClient
+from src.db.session import Session
+from src.db.stage import Stage
+import src.util as util
 
 logger = logging.getLogger(__name__)
 

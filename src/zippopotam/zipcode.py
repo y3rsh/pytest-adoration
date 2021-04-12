@@ -3,19 +3,26 @@ import json
 from dataclasses import dataclass
 from dataclasses import field
 from typing import List
-from place import Place
+from src.zippopotam.place import Place
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class Zip:
+class ZipCode:
+    """
+    Object to represent a united states zip code
+    """
+
     post_code: str = None
     country: str = None
     country_abbreviation: str = None
     places: List[Place] = field(default_factory=list)
 
     def safe_load(self, body):
+        """
+        safely load
+        """
         try:
             zip_holder = json.loads(body)
             self.post_code = zip_holder["post code"]
@@ -31,5 +38,5 @@ class Zip:
                         latitude=place["latitude"],
                     )
                 )
-        except KeyError as e:
-            logger.exception(f"Key {e} NOT FOUND")
+        except KeyError as error:
+            logger.exception(f"Key {error} NOT FOUND")

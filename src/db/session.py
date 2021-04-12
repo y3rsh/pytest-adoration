@@ -4,6 +4,11 @@ from dataclasses import dataclass
 
 @dataclass
 class Session:
+    """
+    object to represent a session of tests
+    this is all tests collected by a command argument to pytest
+    """
+
     sessionid: str
     environment: str
     app_version: str

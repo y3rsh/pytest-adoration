@@ -63,7 +63,9 @@ def pytest_report_collectionfinish(config, items):
                     if marker.name == "meta"
                 ]
                 if arg
-            ][0],
+            ][0]
+            if item.own_markers
+            else [],
         }
         for item in items
     )
@@ -111,6 +113,9 @@ def add_metadata_to_reports(request, record_property, extra):
     """
     add the keyword arguments from the meta mark to the html and junit xml reports
     """
+    if not request.node.own_markers:
+        logger.warning(f"test: {request.node.name} has no markers")
+        return
     metadata = [
         arg
         for arg in [

@@ -42,3 +42,10 @@ def test_valid_zip_codes_better_name(zippopotam_client, zip_code):
     zip_data.safe_load(response.text)
     assert response.status_code == 200
     assert zip_data.post_code == zip_code
+
+
+def test_failure():
+    """
+    test an assertion failure
+    """
+    assert False

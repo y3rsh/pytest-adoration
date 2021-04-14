@@ -7,7 +7,7 @@ valid_zip_codes = ["66046", "66502", "94608", "02861", "65202", "99705"]
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.integration
+@pytest.mark.meta(test_type="general", attack="happy path")
 @pytest.mark.parametrize("zip_code", valid_zip_codes)
 def test_valid_zip_codes(zippopotam_client, zip_code):
     """
@@ -30,7 +30,7 @@ id_named_valid_zip_codes = [
 ]
 
 
-@pytest.mark.integration
+@pytest.mark.meta(test_type="general", attack="happy path")
 @pytest.mark.parametrize("zip_code", id_named_valid_zip_codes)
 def test_valid_zip_codes_better_name(zippopotam_client, zip_code):
     """

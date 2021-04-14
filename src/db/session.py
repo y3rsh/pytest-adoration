@@ -13,5 +13,5 @@ class Session:
     environment: str
     app_version: str
     start_time: str
-    collected_tests: List[str]
+    collected_tests: List[dict]
     finish_time: str = None

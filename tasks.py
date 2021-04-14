@@ -10,14 +10,14 @@ def black(context):
     Run black - invoke black
     """
     if os.name == "nt":
-        p = subprocess.Popen(
+        sub_popen = subprocess.Popen(
             [
                 "powershell.exe",
                 """&poetry run black @(Get-ChildItem -Recurse -Filter *.py| % {$_.FullName})""",
             ],
             stdout=sys.stdout,
         )
-        p.communicate()
+        sub_popen.communicate()
     else:
         context.run(
             """find . | grep -E "(\.py$)" | xargs poetry run black"""  # noqa: W605 pylint: disable=anomalous-backslash-in-string
@@ -37,7 +37,7 @@ def pylint(context):
     """
     run pylint - invoke pylint
     """
-    context.run("""poetry run pylint tests src""")
+    context.run("""poetry run pylint tests src *.py""")
 
 
 @task

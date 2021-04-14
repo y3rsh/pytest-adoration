@@ -2,6 +2,7 @@ import uuid
 import os
 import logging
 import pytest
+from pytest_html import extras
 import src.db.dynamo as db
 from src.zippopotam.zippopotam_client import ZippopotamClient
 from src.db.session import Session
@@ -9,9 +10,13 @@ from src.db.stage import Stage
 import src.util as util
 
 logger = logging.getLogger(__name__)
+# pylint: disable:unused-argument
 
 
 def pytest_addoption(parser):
+    """
+    add CLI options
+    """
     parser.addoption("--base-url", action="store", default="api.zippopotam.us")
     parser.addoption(
         "--remote-dynamo",
@@ -22,18 +27,23 @@ def pytest_addoption(parser):
 
 @pytest.fixture
 def zippopotam_client(request) -> ZippopotamClient:
+    """
+    API client
+    """
     return ZippopotamClient(request.config.getoption("--base-url"))
 
 
-def pytest_runtest_logstart(nodeid, location):
+def pytest_runtest_logstart():
     """
     Runs before each test.
     """
     pytest.testid = str(uuid.uuid4().hex)
 
 
-# after we know what tests are collected to run
-def pytest_report_collectionfinish(config, startdir, items):
+def pytest_report_collectionfinish(config, items):
+    """
+    after we know what tests are collected to run
+    """
     if config.getoption("--remote-dynamo"):
         logger.info("Using remote dynamo")
         pytest.db = db.Dynamo(False)
@@ -42,19 +52,36 @@ def pytest_report_collectionfinish(config, startdir, items):
         pytest.db = db.Dynamo()
     sessionid = str(uuid.uuid4().hex)  # generate a unique id for the test session
     logger.info(f"sessionid is {sessionid}")
+    test_names_and_marks = list(
+        {
+            "testid": item.nodeid,
+            "metadata": [
+                arg
+                for arg in [
+                    marker.kwargs
+                    for marker in item.own_markers
+                    if marker.name == "meta"
+                ]
+                if arg
+            ][0],
+        }
+        for item in items
+    )
     pytest.session = Session(
         sessionid,
         os.environ.get("ENVIRONMENT", "empty"),
         os.environ.get("APP_VERSION", "empty"),
         util.timestamp(),
-        [item.nodeid for item in items],
+        test_names_and_marks,
     )
     logger.info(pytest.session.collected_tests)
     pytest.db.put_session(pytest.session)
 
 
-# after each test stage
 def pytest_runtest_logreport(report):
+    """
+    after each test stage
+    """
     stageid = pytest.testid + "-" + report.when  # unique id
     logger.info(f"stageid = {stageid}")
     stage = Stage(
@@ -71,8 +98,32 @@ def pytest_runtest_logreport(report):
     pytest.db.put_stage(stage)
 
 
-# after all tests finished
-def pytest_terminal_summary(terminalreporter, exitstatus, config):
+def pytest_terminal_summary():
+    """
+    after all tests finish
+    """
     pytest.session.finish_time = util.timestamp()
-    # todo add test result data to the session
     pytest.db.put_session(pytest.session)
+
+
+@pytest.fixture(autouse=True, scope="function")
+def add_metadata_to_reports(request, record_property, extra):
+    """
+    add the keyword arguments from the meta mark to the html and junit xml reports
+    """
+    metadata = [
+        arg
+        for arg in [
+            marker.kwargs
+            for marker in request.node.own_markers
+            if marker.name == "meta"
+        ]
+        if arg
+    ][0]
+    for metadata_key in metadata:
+        extra.append(
+            extras.html(
+                f"""<p>{metadata_key}: {metadata.get(metadata_key, None)}</p>"""
+            )
+        )
+        record_property(metadata_key, metadata.get(metadata_key, None))

@@ -14,4 +14,10 @@ class Stage:  # pylint: disable=too-many-instance-attributes
     app_version: str
     stage: str
     outcome: str
+    longreprtext: str
+    capstdout: str
+    capstderr: str
+    sections: dict
+    user_properties: dict
+    caplog: str
     timestamp: str

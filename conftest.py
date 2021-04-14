@@ -99,6 +99,12 @@ def pytest_runtest_logreport(report):
         pytest.session.app_version,
         report.when,
         report.outcome,
+        report.longreprtext,
+        report.capstdout,
+        report.capstderr,
+        dict(report.sections),
+        dict(report.user_properties),
+        report.caplog,
         util.timestamp(),
     )
     logger.debug("stage is: {stage}")

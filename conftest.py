@@ -55,16 +55,21 @@ def pytest_report_collectionfinish(config, items):
     test_names_and_marks = list(
         {
             "testid": item.nodeid,
-            "metadata": [
-                arg
-                for arg in [
-                    marker.kwargs
-                    for marker in item.own_markers
-                    if marker.name == "meta"
-                ]
-                if arg
-            ][0]
-            if item.own_markers
+            "metadata": next(
+                iter(
+                    [
+                        arg
+                        for arg in [
+                            marker.kwargs
+                            for marker in item.own_markers
+                            if marker.name == "meta"
+                        ]
+                        if arg
+                    ]
+                ),
+                [],
+            )
+            if "meta" in [marker.name for marker in item.own_markers]
             else [],
         }
         for item in items
@@ -111,20 +116,29 @@ def pytest_terminal_summary():
 @pytest.fixture(autouse=True, scope="function")
 def add_metadata_to_reports(request, record_property, extra):
     """
-    add the keyword arguments from the meta mark to the html and junit xml reports
+    add the keyword arguments from the meta mark to the html and junit reports
     """
     if not request.node.own_markers:
         logger.warning(f"test: {request.node.name} has no markers")
         return
-    metadata = [
-        arg
-        for arg in [
-            marker.kwargs
-            for marker in request.node.own_markers
-            if marker.name == "meta"
-        ]
-        if arg
-    ][0]
+    metadata = (
+        next(
+            iter(
+                [
+                    arg
+                    for arg in [
+                        marker.kwargs
+                        for marker in request.node.own_markers
+                        if marker.name == "meta"
+                    ]
+                    if arg
+                ]
+            ),
+            [],
+        )
+        if "meta" in [marker.name for marker in request.node.own_markers]
+        else []
+    )
     for metadata_key in metadata:
         extra.append(
             extras.html(

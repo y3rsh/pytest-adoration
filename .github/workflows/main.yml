@@ -26,7 +26,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
     - name: Run All Tests
+      continue-on-error: true
       run: pytest --remote-dynamo --log-cli-level debug
       env:
         ENVIRONMENT: github
         APP_VERSION: 0.1.1
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: always()
+      with:
+        files: ./results.xml

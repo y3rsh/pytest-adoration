@@ -10,14 +10,14 @@ def black(context):
     Run black - invoke black
     """
     if os.name == "nt":
-        sub_popen = subprocess.Popen(
+        with subprocess.Popen(
             [
                 "powershell.exe",
                 """&poetry run black @(Get-ChildItem -Recurse -Filter *.py| % {$_.FullName})""",
             ],
             stdout=sys.stdout,
-        )
-        sub_popen.communicate()
+        ) as sub_process:
+            sub_process.communicate()
     else:
         context.run(
             """find . | grep -E "(\.py$)" | xargs poetry run black"""  # noqa: W605 pylint: disable=anomalous-backslash-in-string

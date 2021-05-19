@@ -52,7 +52,7 @@ def pytest_report_collectionfinish(config, items):
         pytest.db = db.Dynamo()
     sessionid = str(uuid.uuid4().hex)  # generate a unique id for the test session
     logger.info(f"sessionid is {sessionid}")
-    test_names_and_marks = list(
+    test_names_and_marks = [
         {
             "testid": item.nodeid,
             "metadata": next(
@@ -73,7 +73,7 @@ def pytest_report_collectionfinish(config, items):
             else [],
         }
         for item in items
-    )
+    ]
     pytest.session = Session(
         sessionid,
         os.environ.get("ENVIRONMENT", "empty"),

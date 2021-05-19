@@ -76,7 +76,8 @@ Most CI systems make it easy to set environment variables so we will use them to
 2. make sure everything is installed
     - `poetry install`
 3. create the table locally
-    - `poetry run python dynamo.py`
+    - call dynamo.py as a module directly so the imports will work
+    - `poetry run python -m src.db.dynamo`
 4. run the tests using local dynamo
     - `poetry run pytest --log-cli-level debug`
 5. run the tests using remote dynamo (AWS CLI config read by boto)

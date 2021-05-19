@@ -73,7 +73,7 @@ class Dynamo:
         helper method to create a sessions table
         """
         try:
-            table = self.dynamo_resource.create_table(
+            return self.dynamo_resource.create_table(
                 TableName=SESSIONS_TABLE_NAME,
                 KeySchema=[
                     {"AttributeName": "sessionid", "KeyType": "HASH"},
@@ -86,7 +86,6 @@ class Dynamo:
                     "WriteCapacityUnits": 10,
                 },
             )
-            return table
         except EndpointConnectionError as error:
             logger.warning(f"Not connected to dynamo {error}")
             self.db_connection = False
@@ -98,7 +97,7 @@ class Dynamo:
         helper method to create a stages table
         """
         try:
-            table = self.dynamo_resource.create_table(
+            return self.dynamo_resource.create_table(
                 TableName=STAGES_TABLE_NAME,
                 KeySchema=[
                     {"AttributeName": "stageid", "KeyType": "HASH"},
@@ -111,7 +110,6 @@ class Dynamo:
                     "WriteCapacityUnits": 10,
                 },
             )
-            return table
         except EndpointConnectionError as error:
             logger.warning(f"Not connected to dynamo {error}")
             self.db_connection = False

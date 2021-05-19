@@ -13,6 +13,8 @@ jobs:
         python-version: 3.9.1
     - name: install dependencies
       run: pip install -r requirements.txt
+    - name: install playwright
+      run: python -m playwright install
     - name: black
       run: black . --check
     - name: flake8

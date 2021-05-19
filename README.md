@@ -82,3 +82,8 @@ Most CI systems make it easy to set environment variables so we will use them to
     - `poetry run pytest --log-cli-level debug`
 5. run the tests using remote dynamo (AWS CLI config read by boto)
     - `poetry run pytest --remote-dynamo --log-cli-level debug`
+
+## Playwright
+
+- [Link](https://github.com/microsoft/playwright-pytest#readme)
+- `pytest -m pw --browser-channel msedge --headed --slowmo 1000`

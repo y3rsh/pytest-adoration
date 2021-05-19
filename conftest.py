@@ -17,7 +17,7 @@ def pytest_addoption(parser):
     """
     add CLI options
     """
-    parser.addoption("--base-url", action="store", default="api.zippopotam.us")
+    parser.addoption("--zip-url", action="store", default="api.zippopotam.us")
     parser.addoption(
         "--remote-dynamo",
         action="store_true",
@@ -30,7 +30,7 @@ def zippopotam_client(request) -> ZippopotamClient:
     """
     API client
     """
-    return ZippopotamClient(request.config.getoption("--base-url"))
+    return ZippopotamClient(request.config.getoption("--zip-url"))
 
 
 def pytest_runtest_logstart():

@@ -86,4 +86,5 @@ Most CI systems make it easy to set environment variables so we will use them to
 ## Playwright
 
 - [Link](https://github.com/microsoft/playwright-pytest#readme)
-- `pytest -m pw --browser-channel msedge --headed --slowmo 1000`
+- run against edge `pytest -m pw --browser-channel msedge --headed --slowmo 1000`
+- run against chrome `pytest -m pw --browser-channel chrome --headed --slowmo 1000`

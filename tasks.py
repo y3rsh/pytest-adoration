@@ -37,7 +37,7 @@ def pylint(context):
     """
     run pylint - invoke pylint
     """
-    context.run("""poetry run pylint tests src *.py""")
+    context.run("""poetry run pylint tests src""")
 
 
 @task

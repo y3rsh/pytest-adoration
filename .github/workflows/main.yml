@@ -6,35 +6,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@main
-    - name: Setup Python
-      uses: actions/setup-python@main
-      with:
-        python-version: 3.9.1
-    - name: install dependencies
-      run: pip install -r requirements.txt
-    - name: install playwright
-      run: python -m playwright install
-    - name: black
-      run: black . --check
-    - name: flake8
-      run: flake8
-    - name: pylint
-      run: pylint tests src
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-    - name: Run All Tests
-      continue-on-error: true
-      run: pytest --remote-dynamo --log-cli-level debug
-      env:
-        ENVIRONMENT: github
-        APP_VERSION: 0.1.1
-    - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
-      if: always()
-      with:
-        files: ./results.xml
+      - uses: actions/checkout@main
+      - name: Setup Python
+        uses: actions/setup-python@main
+        with:
+          python-version: 3.9.1
+      - name: install poetry
+        run: pip install -U poetry
+      - name: configure poetry
+        run: poetry config virtualenvs.create false
+      - name: install dependencies from poetry
+        run: poetry install --no-interaction --no-ansi
+      - name: install playwright
+        run: python -m playwright install
+      - name: black
+        run: black . --check
+      - name: flake8
+        run: flake8
+      - name: pylint
+        run: pylint tests src
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Run All Tests
+        continue-on-error: true
+        run: pytest --remote-dynamo --log-cli-level debug
+        env:
+          ENVIRONMENT: github
+          APP_VERSION: 0.1.1
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: ./results.xml

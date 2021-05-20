@@ -56,4 +56,3 @@ def ready(context):
     black(context)
     flake8(context)
     pylint(context)
-    make_requirements(context)

@@ -24,6 +24,14 @@ def pytest_addoption(parser):
         default=False,
     )
 
+    #  https://github.com/MobileDynasty/pytest-env/blob/master/pytest_env/plugin.py
+
+    help_msg = (
+        "a line separated list of environment variables " "of the form NAME=VALUE."
+    )
+
+    parser.addini("env", type="linelist", help=help_msg, default=[])
+
 
 @pytest.fixture
 def zippopotam_client(request) -> ZippopotamClient:
@@ -89,6 +97,8 @@ def pytest_runtest_logreport(report):
     """
     after each test stage
     """
+    if not hasattr(pytest, "session"):
+        return
     stageid = pytest.testid + "-" + report.when  # unique id
     logger.info(f"stageid = {stageid}")
     stage = Stage(
@@ -115,8 +125,9 @@ def pytest_terminal_summary():
     """
     after all tests finish
     """
-    pytest.session.finish_time = util.timestamp()
-    pytest.db.put_session(pytest.session)
+    if hasattr(pytest, "session"):
+        pytest.session.finish_time = util.timestamp()
+        pytest.db.put_session(pytest.session)
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -152,3 +163,32 @@ def add_metadata_to_reports(request, record_property, extra):
             )
         )
         record_property(metadata_key, metadata.get(metadata_key, None))
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_load_initial_conftests(args, early_config, parser):
+    """
+    Load environment variables from configuration files.
+    https://github.com/MobileDynasty/pytest-env/blob/master/pytest_env/plugin.py
+    """
+    for e in early_config.getini("env"):
+        part = e.partition("=")
+        key = part[0].strip()
+        value = part[2].strip()
+
+        # Replace environment variables in value. for instance:
+        # TEST_DIR={USER}/repo_test_dir.
+        value = value.format(**os.environ)
+
+        # use D: as a way to designate a default value
+        # that will only override env variables if they
+        # do not exist already
+        dkey = key.split("D:")
+        default_val = False
+
+        if len(dkey) == 2:
+            key = dkey[1]
+            default_val = True
+
+        if not default_val or key not in os.environ:
+            os.environ[key] = value

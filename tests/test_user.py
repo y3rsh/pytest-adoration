@@ -15,6 +15,7 @@ def test_user():
     """
     use the fake method
     """
+    Path("target").mkdir(parents=True, exist_ok=True)
     file_path = Path("target/users.json")
     users = [json.loads(User.fake().json()) for _ in range(20)]
     with open(file_path, "w") as json_file:

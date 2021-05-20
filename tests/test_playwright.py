@@ -13,6 +13,6 @@ def test_pw(page: Page):
     assert page.inner_text("h1") == "Example Domain"
     page.click("text=More information")
     page.wait_for_load_state("domcontentloaded")
-    page.screenshot(path=f"more-info-{timestamp_milliseconds()}.png")
+    page.screenshot(path=f"target/more-info-{timestamp_milliseconds()}.png")
     page.goto("http://whatsmyuseragent.org/")
-    page.screenshot(path=f"browser-{timestamp_milliseconds()}.png")
+    page.screenshot(path=f"target/browser-{timestamp_milliseconds()}.png")

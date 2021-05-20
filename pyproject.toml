@@ -21,6 +21,8 @@ pylint = "^2.7.4"
 pydantic = {extras = ["email", "dotenv"], version = "^1.8.2"}
 playwright = "^1.11.1"
 pytest-playwright = "^0.1.1"
+Faker = "^8.2.0"
+rich = "^10.2.2"
 
 
 [build-system]

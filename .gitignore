@@ -54,3 +54,4 @@ report.html
 results.xml
 
 *.png
+target/
